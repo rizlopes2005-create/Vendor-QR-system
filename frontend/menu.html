@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Arun Bites</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">🥘</div>
+            <div class="nav-item active" onclick="window.location.href='index.html'">🏠</div>
+
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="app-header">
+                <div>
+                    <h1 style="font-size: 1.5rem; font-weight: 800;">Welcome to Arun Bites</h1>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">What would you like to eat today?</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="color: var(--text-muted)">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" placeholder="Search for food..." onkeyup="searchMenu(this.value)">
+                    </div>
+                    <div class="icon-btn" onclick="goToCart()">
+                        🛒
+                        <span id="cart-count"
+                            style="position: absolute; top: -5px; right: -5px; background: var(--primary); color: white; font-size: 0.65rem; padding: 2px 5px; border-radius: 50%; font-weight: 800; display: none;">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Promo Banner -->
+            <section class="promo-banner animate-fade-in">
+                <div class="promo-content">
+                    <h2>50% OFF</h2>
+                    <p>the full piece of burger today!</p>
+                </div>
+                <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&w=200&q=80"
+                    alt="Burger" class="promo-img">
+            </section>
+
+            <!-- Categories -->
+            <div class="category-scroll" id="category-tabs">
+                <div class="category-pill active" onclick="filterMenu('All')"><span>🍽️</span> All</div>
+                <div class="category-pill" onclick="filterMenu('Snacks')"><span>🍿</span> Snacks</div>
+                <div class="category-pill" onclick="filterMenu('Drinks')"><span>🥤</span> Drinks</div>
+                <div class="category-pill" onclick="filterMenu('Meals')"><span>🍱</span> Meals</div>
+            </div>
+
+            <!-- Menu Grid -->
+            <div class="menu-grid" id="menu-container">
+                <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    <div class="spinner" style="margin: 0 auto;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="cart-float" class="cart-float" style="display: none;" onclick="goToCart()"></div>
+
+    <!-- Smart Suggestions Overlay -->
+    <div id="suggestion-overlay" class="suggestion-overlay" onclick="if(event.target === this) closeSuggestions()">
+        <div class="suggestion-card">
+            <h3 style="margin-bottom: 5px; font-weight: 800;">Better Together! 🤩</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Customers also ordered these:
+            </p>
+            <div id="suggestion-list"></div>
+            <button class="btn btn-outline" onclick="closeSuggestions()"
+                style="margin-top:10px; border:none; color:var(--primary);">No thanks, I'm good</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMenu();
+            updateCartUI();
+        });
+    </script>
+</body>
+
+</html>

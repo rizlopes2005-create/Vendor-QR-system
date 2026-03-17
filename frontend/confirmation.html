@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - Arun Bites</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container animate-fade-in" style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        
+        <div style="font-size: 5rem; margin-bottom: 20px;">✅</div>
+        <h1 style="font-weight: 800; margin-bottom: 5px;">Order Placed!</h1>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Your food is being prepared with love.</p>
+
+        <div class="card" style="width: 100%; padding: 30px;">
+            <p style="font-weight: 600; text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px;">Your Token Number</p>
+            <h2 style="font-size: 4rem; font-weight: 800; color: var(--primary); margin: 5px 0;" id="order-token">--</h2>
+            
+            <!-- Progress Tracker -->
+            <div class="tracker-container">
+                <div class="tracker-line">
+                    <div class="tracker-line-progress"></div>
+                </div>
+                <div class="tracker-step">
+                    <div class="step-icon">🧾</div>
+                    <span class="step-label">Ordered</span>
+                </div>
+                <div class="tracker-step">
+                    <div class="step-icon">👨‍🍳</div>
+                    <span class="step-label">Preparing</span>
+                </div>
+                <div class="tracker-step">
+                    <div class="step-icon">✅</div>
+                    <span class="step-label">Ready</span>
+                </div>
+            </div>
+
+            <div style="margin: 20px 0; padding-top: 20px; border-top: 1px dashed #EEE;">
+                <p style="font-weight: 600;">Status: <span id="order-status" class="badge badge-pending">Order Received</span></p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Wait Time: <span id="wait-time">~10 mins</span></p>
+            </div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="window.location.href='menu.html'" style="margin-top: 20px;">
+            Order More
+        </button>
+        
+        <p style="margin-top: 40px; font-size: 0.8rem; color: var(--text-muted);">
+            Please show your token to the vendor when your status is <strong>READY</strong>.
+        </p>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('id');
+            if (orderId) {
+                trackOrder(orderId);
+            }
+        });
+    </script>
+</body>
+</html>

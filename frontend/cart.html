@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Arun Bites</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo" onclick="window.location.href='menu.html'" style="cursor: pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back to Menu</span>
+        </div>
+    </header>
+
+    <div class="container animate-fade-in">
+        <h1 style="margin-bottom: 20px; font-weight: 800;">My Cart</h1>
+
+        <div id="cart-items-container">
+            <!-- Cart items will be loaded here -->
+        </div>
+
+        <div id="empty-cart" style="display: none; text-align: center; padding: 60px 20px;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🛒</div>
+            <h2 style="margin-bottom: 10px;">Your cart is empty</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Add some tasty street food to get started!</p>
+            <button class="btn btn-primary" onclick="window.location.href='menu.html'">Browse Menu</button>
+        </div>
+
+        <div id="cart-summary" style="margin-top: 30px; display: none;">
+            <div class="card" style="padding: 20px;">
+                <div
+                    style="display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--text-muted);">
+                    <span>Subtotal</span>
+                    <span id="subtotal">₹0</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: 800; font-size: 1.2rem; border-top: 1px dashed #DDD; padding-top: 10px;">
+                    <span>Total</span>
+                    <span id="total">₹0</span>
+                </div>
+
+                <h3 style="margin-bottom: 15px; font-size: 1rem;">Payment Method</h3>
+                <div class="payment-methods">
+                    <div class="method-card active" id="method-cash" onclick="selectPayment('Cash')">
+                        <div style="font-size: 1.5rem; margin-bottom: 5px;">💵</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Cash</div>
+                    </div>
+                    <div class="method-card" id="method-upi" onclick="selectPayment('UPI')">
+                        <div style="font-size: 1.5rem; margin-bottom: 5px;">📱</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">UPI</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px; padding: 15px; background: #F8FAFC; border-radius: 12px; border: 1px dashed #E2E8F0;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+                        Orders paid via <strong>Cash</strong> are placed immediately.<br>
+                        <strong>UPI</strong> orders will lead to a secure payment page.
+                    </p>
+                </div>
+
+                <button class="btn btn-primary" id="place-order-btn" onclick="placeOrder()">
+                    Confirm & Place Order
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCartPage();
+        });
+    </script>
+</body>
+
+</html>
