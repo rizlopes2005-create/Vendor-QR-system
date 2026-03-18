@@ -1,6 +1,6 @@
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-// UPDATE THIS with your real Railway backend URL after you deploy it:
-const PROD_BACKEND_URL = 'https://your-railway-app-name.up.railway.app'; 
+// UPDATE THIS with your real Render backend URL after you deploy it:
+const PROD_BACKEND_URL = 'https://your-backend-name.onrender.com'; 
 
 const API_URL = IS_LOCAL ? 'http://localhost:8000' : PROD_BACKEND_URL;
 const WS_URL = IS_LOCAL ? 'ws://localhost:8000/ws' : PROD_BACKEND_URL.replace('http', 'ws') + '/ws';
