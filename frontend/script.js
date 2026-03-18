@@ -1,9 +1,18 @@
+// Detect if running locally or on deployed site
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-// UPDATE THIS with your real Render backend URL after you deploy it:
-const PROD_BACKEND_URL = 'https://your-backend-name.onrender.com'; 
 
-const API_URL = IS_LOCAL ? 'http://localhost:8000' : PROD_BACKEND_URL;
-const WS_URL = IS_LOCAL ? 'ws://localhost:8000/ws' : PROD_BACKEND_URL.replace('http', 'ws') + '/ws';
+// 🔴 REPLACE this with your Render backend URL after deploying the backend
+const PROD_BACKEND_URL = 'https://your-backend-name.onrender.com';
+
+// API endpoint (REST)
+const API_URL = IS_LOCAL
+    ? 'http://localhost:8000'
+    : PROD_BACKEND_URL;
+
+// WebSocket endpoint (Real-time updates)
+const WS_URL = IS_LOCAL
+    ? 'ws://localhost:8000/ws'
+    : PROD_BACKEND_URL.replace('https', 'wss').replace('http', 'ws') + '/ws';
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let currentCategory = 'All';
