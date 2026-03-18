@@ -1,0 +1,25 @@
+{
+  "name": "arun-bites-qr-system",
+  "version": "1.0.0",
+  "description": "QR-based ordering system for street vendors",
+  "main": "index.js",
+  "scripts": {
+    "start": "start.bat",
+    "start:backend": "cd backend && venv\\Scripts\\activate && uvicorn main:app --reload --port 8000",
+    "start:frontend": "cd frontend && http-server -p 8080",
+    "install:frontend": "npm install -g http-server"
+  },
+  "keywords": [
+    "qr-code",
+    "ordering",
+    "vendor",
+    "restaurant",
+    "fastapi",
+    "websocket"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

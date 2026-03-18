@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Dict
 import json
 import asyncio
@@ -9,6 +9,7 @@ import models
 import schemas
 import database
 from database import engine, get_db
+import priority_queue
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -42,13 +43,9 @@ manager = ConnectionManager()
 
 # Order Queue Logic
 def calculate_priority(order: models.Order, items_count: int):
-    # Higher priority for smaller orders (SJF) and Prepaid (UPI)
-    priority_score = 0
-    if items_count <= 2:
-        priority_score += 10
-    if order.payment_method == "UPI":
-        priority_score += 5
-    return priority_score > 0
+    is_prepaid = order.payment_method == "UPI"
+    score = priority_queue.calculate_priority(items_count, is_prepaid)
+    return score > 0
 
 # Endpoints
 @app.get("/menu", response_model=List[schemas.MenuItem])
@@ -65,7 +62,7 @@ def add_menu_item(item: schemas.MenuItemCreate, db: Session = Depends(get_db)):
 
 @app.post("/orders", response_model=schemas.Order)
 async def create_order(order_data: schemas.OrderCreate, db: Session = Depends(get_db)):
-    # Calculate token number (last order token + 1)
+    # Calculate token number
     last_order = db.query(models.Order).order_by(models.Order.id.desc()).first()
     token_number = (last_order.token_number % 100) + 1 if last_order else 1
     
@@ -76,27 +73,25 @@ async def create_order(order_data: schemas.OrderCreate, db: Session = Depends(ge
         status="Pending"
     )
     
-    db.add(new_order)
-    db.commit()
-    db.refresh(new_order)
-    
+    # Add items to the relationship immediately
     items_count = 0
     for item in order_data.items:
         order_item = models.OrderItem(
-            order_id=new_order.id,
             menu_item_id=item.menu_item_id,
             quantity=item.quantity
         )
         items_count += item.quantity
-        db.add(order_item)
+        new_order.items.append(order_item)
     
+    # Calculate priority using our Python module
     new_order.is_priority = calculate_priority(new_order, items_count)
+    
+    db.add(new_order)
     db.commit()
     db.refresh(new_order)
     
-    # Notify Vendor via WebSocket
+    # Notify Vendor via WebSocket with full data loaded
     order_dict = schemas.Order.model_validate(new_order).model_dump()
-    # Convert datetime to string for JSON serialization
     order_dict['timestamp'] = order_dict['timestamp'].isoformat()
     await manager.broadcast(json.dumps({"type": "NEW_ORDER", "order": order_dict}))
     
@@ -104,10 +99,12 @@ async def create_order(order_data: schemas.OrderCreate, db: Session = Depends(ge
 
 @app.get("/orders", response_model=List[schemas.Order])
 def get_orders(db: Session = Depends(get_db)):
-    # Sorting logic: Priority first, then FCFS (timestamp)
-    # But SJF is usually for the kitchen, so we return orders as they come
-    # but the vendor can see which ones are priority.
-    return db.query(models.Order).order_by(models.Order.status == "Pending", models.Order.is_priority.desc(), models.Order.timestamp.asc()).all()
+    # FIX: Use .desc() on status check and preload items to avoid lazy load issues
+    return db.query(models.Order).options(joinedload(models.Order.items)).order_by(
+        (models.Order.status == "Pending").desc(), 
+        models.Order.is_priority.desc(), 
+        models.Order.timestamp.asc()
+    ).all()
 
 @app.patch("/orders/{order_id}/status")
 async def update_order_status(order_id: int, status: str, db: Session = Depends(get_db)):
