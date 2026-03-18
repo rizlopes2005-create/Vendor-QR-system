@@ -1,5 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+from sqlalchemy import desc
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Dict
 import json
@@ -22,6 +26,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve Frontend static files
+frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
+if os.path.exists(frontend_path):
+    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
+@app.get("/")
+async def read_index():
+    index_file = os.path.join(frontend_path, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"message": "Arun Bites API is running. Frontend folder not found."}
+
+@app.get("/{file_name:path}")
+async def serve_frontend_files(file_name: str):
+    # Try serving from root of frontend folder (for html files)
+    file_path = os.path.join(frontend_path, file_name)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    return {"error": "File not found"}
 
 # WebSocket Manager
 class ConnectionManager:
@@ -101,7 +125,7 @@ async def create_order(order_data: schemas.OrderCreate, db: Session = Depends(ge
 def get_orders(db: Session = Depends(get_db)):
     # FIX: Use .desc() on status check and preload items to avoid lazy load issues
     return db.query(models.Order).options(joinedload(models.Order.items)).order_by(
-        (models.Order.status == "Pending").desc(), 
+        desc(models.Order.status == "Pending"), 
         models.Order.is_priority.desc(), 
         models.Order.timestamp.asc()
     ).all()
@@ -145,33 +169,34 @@ async def websocket_endpoint(websocket: WebSocket):
 # Seed Data
 @app.post("/seed")
 def seed_data(db: Session = Depends(get_db)):
-    if db.query(models.MenuItem).count() > 0:
-        return {"message": "Already seeded"}
+    # Clear existing data to ensure current seed data is loaded
+    db.query(models.OrderItem).delete()
+    db.query(models.MenuItem).delete()
     
     items = [
         # Burgers
         models.MenuItem(name="Beast Burger", description="Signature double patty with melting cheese and secret sauce", price=149.0, category="Burgers", image_url="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80"),
-        models.MenuItem(name="Mexi-Zing Burger", description="Spicy jalapeno patty with salsa and crunchy nachos", price=129.0, category="Burgers", image_url="https://images.unsplash.com/photo-1582196016295-f8c499b33b0a?auto=format&fit=crop&w=400&q=80"),
-        models.MenuItem(name="Crispy Paneer Burger", description="Golden fried paneer slab with herb mayo", price=110.0, category="Burgers", image_url="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Mexi-Zing Burger", description="Spicy jalapeno patty with salsa and crunchy nachos", price=129.0, category="Burgers", image_url="mexi_zing_burger_item_1773810830391.png"),
+        models.MenuItem(name="Crispy Paneer Burger", description="Golden fried paneer slab with herb mayo", price=110.0, category="Burgers", image_url="crispy_paneer_burger_item_1773810860006.png"),
         
         # Pizzas
-        models.MenuItem(name="Supreme Symphony", description="Loaded with olives, capsicum, corn and premium mozzarella", price=299.0, category="Pizza", image_url="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Supreme Symphony", description="Loaded with olives, capsicum, corn and premium mozzarella", price=299.0, category="Pizza", image_url="supreme_symphony_pizza_item_1773810880152.png"),
         models.MenuItem(name="Pepperoni Paradise", description="Classic smoked pepperoni with extra cheese pulling delight", price=349.0, category="Pizza", image_url="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80"),
         models.MenuItem(name="Garden Fresh Pizza", description="Farm-picked vegetables with a thin crust base", price=249.0, category="Pizza", image_url="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80"),
         
         # Rolls & Snacks
-        models.MenuItem(name="Peri-Peri Wrap", description="Juicy chicken/paneer wrap with spicy peri-peri dust", price=89.0, category="Rolls", image_url="https://images.unsplash.com/photo-1626700051175-65686c5de224?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Peri-Peri Wrap", description="Juicy chicken/paneer wrap with spicy peri-peri dust", price=89.0, category="Rolls", image_url="https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&w=400&q=80"),
         models.MenuItem(name="Cheese Corn Balls", description="Melt-in-mouth cheesy centers with a crunchy exterior", price=75.0, category="Snacks", image_url="https://images.unsplash.com/photo-1605333396915-47ed6b68a00e?auto=format&fit=crop&w=400&q=80"),
         models.MenuItem(name="Loaded Nachos", description="Mexican nachos topped with beans, cheese and cream", price=120.0, category="Snacks", image_url="https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=400&q=80"),
         
         # Drinks
-        models.MenuItem(name="Midnight Mocha", description="Dark chocolate cold coffee with whipped cream", price=95.0, category="Drinks", image_url="https://images.unsplash.com/photo-1541167760496-162955ed2a95?auto=format&fit=crop&w=400&q=80"),
-        models.MenuItem(name="Berry Blast", description="Refreshing mix of blueberries, strawberries and mint", price=85.0, category="Drinks", image_url="https://images.unsplash.com/photo-1544145945-f904253db0ad?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Midnight Mocha", description="Dark chocolate cold coffee with whipped cream", price=95.0, category="Drinks", image_url="https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Berry Blast", description="Refreshing mix of blueberries, strawberries and mint", price=85.0, category="Drinks", image_url="https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=400&q=80"),
         models.MenuItem(name="Classic Lemonade", description="Old fashioned icy lemonade with Himalayan salt", price=45.0, category="Drinks", image_url="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=400&q=80"),
         
         # Combos
         models.MenuItem(name="Family Feast", description="2 Burgers, 1 Pizza, 2 Drinks and Large Fries", price=599.0, category="Combos", image_url="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80"),
-        models.MenuItem(name="Value Trio", description="1 Wrap, 1 Snack and 1 Soft Drink", price=199.0, category="Combos", image_url="https://images.unsplash.com/photo-1626700051175-65686c5de224?auto=format&fit=crop&w=400&q=80")
+        models.MenuItem(name="Value Trio", description="1 Wrap, 1 Snack and 1 Soft Drink", price=199.0, category="Combos", image_url="https://images.unsplash.com/photo-1497115082333-fe490e63820a?auto=format&fit=crop&w=400&q=80"),
     ]
     db.add_all(items)
     db.commit()

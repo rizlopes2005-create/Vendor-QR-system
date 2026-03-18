@@ -1,5 +1,9 @@
-const API_URL = 'http://localhost:8000';
-const WS_URL = 'ws://localhost:8000/ws';
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+// UPDATE THIS with your real Railway backend URL after you deploy it:
+const PROD_BACKEND_URL = 'https://your-railway-app-name.up.railway.app'; 
+
+const API_URL = IS_LOCAL ? 'http://localhost:8000' : PROD_BACKEND_URL;
+const WS_URL = IS_LOCAL ? 'ws://localhost:8000/ws' : PROD_BACKEND_URL.replace('http', 'ws') + '/ws';
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let currentCategory = 'All';
@@ -33,6 +37,7 @@ async function loadMenu() {
         const items = await response.json();
         window.menuItems = items;
         renderMenu(items);
+        renderCategories(items);
     } catch (err) {
         console.error(err);
         document.getElementById('menu-container').innerHTML = '<p style="text-align:center; padding:20px;">Could not load menu. Make sure the backend is running.</p>';
@@ -49,11 +54,15 @@ function renderMenu(items) {
         : items.filter(i => i.category === currentCategory);
 
     filtered.forEach(item => {
+        const finalImageUrl = (item.image_url.startsWith('http') || item.image_url.startsWith('data:')) 
+            ? item.image_url 
+            : `images/${item.image_url}`;
+
         const card = document.createElement('div');
         card.className = 'food-card animate-fade-in';
         card.innerHTML = `
             <div class="food-img-container">
-                <img src="${item.image_url}" class="food-img" alt="${item.name}">
+                <img src="${finalImageUrl}" class="food-img" alt="${item.name}">
             </div>
             <div class="food-details">
                 <h3>${item.name}</h3>
@@ -70,11 +79,37 @@ function renderMenu(items) {
     });
 }
 
+function renderCategories(items) {
+    const container = document.getElementById('category-tabs');
+    if (!container) return;
+
+    // Get unique categories
+    const categories = ['All', ...new Set(items.map(i => i.category))];
+    
+    // Icon mapping
+    const icons = {
+        'All': '🍽️',
+        'Burgers': '🍔',
+        'Pizza': '🍕',
+        'Rolls': '🌯',
+        'Snacks': '🍿',
+        'Drinks': '🥤',
+        'Combos': '🍱',
+        'Meals': '🍱'
+    };
+
+    container.innerHTML = categories.map(cat => `
+        <div class="category-pill ${cat === currentCategory ? 'active' : ''}" onclick="filterMenu('${cat}')">
+            <span>${icons[cat] || '🥘'}</span> ${cat}
+        </div>
+    `).join('');
+}
+
 function filterMenu(category) {
     currentCategory = category;
     document.querySelectorAll('.category-pill').forEach(t => {
-        const pillText = t.innerText.split(' ').pop();
-        const isActive = pillText === category || (category === 'All' && pillText === 'All');
+        const pillText = t.innerText.trim().split(' ').pop();
+        const isActive = pillText === category;
         t.classList.toggle('active', isActive);
         if (isActive) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     });
@@ -164,10 +199,14 @@ function showSuggestions(addedItem) {
     if (suggestions.length === 0) return;
 
     suggestions.forEach(s => {
+        const finalImageUrl = (s.image_url.startsWith('http') || s.image_url.startsWith('data:')) 
+            ? s.image_url 
+            : `images/${s.image_url}`;
+
         const div = document.createElement('div');
         div.style.cssText = 'display:flex; align-items:center; gap:15px; margin-bottom:15px; background:#F8FAFC; padding:10px; border-radius:15px; text-align:left;';
         div.innerHTML = `
-            <img src="${s.image_url}" style="width:50px; height:50px; border-radius:10px; object-fit:cover;">
+            <img src="${finalImageUrl}" style="width:50px; height:50px; border-radius:10px; object-fit:cover;">
             <div style="flex:1;">
                 <h4 style="font-size:0.9rem;">${s.name}</h4>
                 <p style="font-size:0.8rem; color:var(--primary); font-weight:700;">₹${s.price}</p>

@@ -4,10 +4,9 @@
   "description": "QR-based ordering system for street vendors",
   "main": "index.js",
   "scripts": {
-    "start": "start.bat",
-    "start:backend": "cd backend && venv\\Scripts\\activate && uvicorn main:app --reload --port 8000",
-    "start:frontend": "cd frontend && http-server -p 8080",
-    "install:frontend": "npm install -g http-server"
+    "start": "echo 'Run the backend and frontend services separately on Render'",
+    "dev:backend": "cd backend && uvicorn main:app --reload --port 8000",
+    "dev:frontend": "cd frontend && npx http-server -p 8080"
   },
   "keywords": [
     "qr-code",
