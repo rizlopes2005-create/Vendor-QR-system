@@ -47,6 +47,14 @@ async def serve_frontend_files(file_name: str):
         return FileResponse(file_path)
     return {"error": "File not found"}
 
+# Auto-seed on startup if DB is empty
+@app.on_event("startup")
+def startup_event():
+    db = next(get_db())
+    if db.query(models.MenuItem).count() == 0:
+        print("Empty database detected. Auto-seeding...")
+        seed_data(db)
+
 # WebSocket Manager
 class ConnectionManager:
     def __init__(self):
