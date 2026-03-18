@@ -27,25 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve Frontend static files
-frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
-if os.path.exists(frontend_path):
-    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
-
-@app.get("/")
-async def read_index():
-    index_file = os.path.join(frontend_path, "index.html")
-    if os.path.exists(index_file):
-        return FileResponse(index_file)
-    return {"message": "Arun Bites API is running. Frontend folder not found."}
-
-@app.get("/{file_name:path}")
-async def serve_frontend_files(file_name: str):
-    # Try serving from root of frontend folder (for html files)
-    file_path = os.path.join(frontend_path, file_name)
-    if os.path.exists(file_path) and os.path.isfile(file_path):
-        return FileResponse(file_path)
-    return {"error": "File not found"}
+# WebSocket Manager
 
 # Auto-seed on startup if DB is empty
 @app.on_event("startup")
@@ -216,3 +198,25 @@ def reset_menu(db: Session = Depends(get_db)):
     db.query(models.MenuItem).delete()
     db.commit()
     return seed_data(db)
+
+# --- STATIC FILE SERVING (Catch-all) ---
+# Serve Frontend static files
+frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
+if os.path.exists(frontend_path):
+    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
+@app.get("/")
+async def read_index():
+    index_file = os.path.join(frontend_path, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"message": "Arun Bites API is running. Frontend folder not found."}
+
+@app.get("/{file_name:path}")
+async def serve_frontend_files(file_name: str):
+    # Try serving from root of frontend folder (for html files)
+    file_path = os.path.join(frontend_path, file_name)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    # If not a file, it's likely a 404
+    raise HTTPException(status_code=404, detail="Not Found")
