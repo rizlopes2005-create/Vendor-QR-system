@@ -1,8 +1,8 @@
 // Detect if running locally or on deployed site
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-// 🔴 REPLACE this with your Render backend URL after deploying the backend
-const PROD_BACKEND_URL = 'https://your-backend-name.onrender.com';
+// 🔴 YOUR RENDER BACKEND URL
+const PROD_BACKEND_URL = 'https://vendor-qr-system-1.onrender.com';
 
 // API endpoint (REST)
 const API_URL = IS_LOCAL
