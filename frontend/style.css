@@ -198,14 +198,21 @@ p {
 }
 
 .promo-content h2 {
-    font-size: 1.8rem;
-    line-height: 1.2;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    letter-spacing: -1px;
 }
 
 .promo-img {
-    width: 120px;
-    transform: rotate(15deg);
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+    width: 140px;
+    transform: rotate(5deg);
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.3));
+    transition: transform 0.5s ease;
+}
+
+.promo-banner:hover .promo-img {
+    transform: rotate(0deg) scale(1.1);
 }
 
 @media (min-width: 640px) {

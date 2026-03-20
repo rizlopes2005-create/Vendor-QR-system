@@ -185,7 +185,7 @@ def seed_data(db: Session = Depends(get_db)):
         
         # Combos
         models.MenuItem(name="Family Feast", description="2 Burgers, 1 Pizza, 2 Drinks and Large Fries", price=599.0, category="Combos", image_url="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80"),
-        models.MenuItem(name="Value Trio", description="1 Wrap, 1 Snack and 1 Soft Drink", price=199.0, category="Combos", image_url="https://images.unsplash.com/photo-1497115082333-fe490e63820a?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Value Trio", description="1 Wrap, 1 Snack and 1 Soft Drink", price=199.0, category="Combos", image_url="https://images.unsplash.com/photo-1606787366850-de6330128bfc?auto=format&fit=crop&w=400&q=80"),
     ]
     db.add_all(items)
     db.commit()
