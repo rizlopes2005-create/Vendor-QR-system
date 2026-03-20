@@ -23,7 +23,7 @@
     </header>
 
     <main class="container">
-        <div class="stats-grid">
+        <div class="stats-grid mb-1">
             <div class="stat-card">
                 <span class="stat-value" id="stats-orders">0</span>
                 <span class="stat-label">Total Orders</span>
@@ -36,18 +36,22 @@
                 <span class="stat-value" id="order-count-badge">0</span>
                 <span class="stat-label">Pending</span>
             </div>
+            <!-- QR Shortcut Button in Stats Grid -->
+            <div class="stat-card" onclick="document.getElementById('qr-section').scrollIntoView({behavior: 'smooth'})"
+                style="cursor: pointer; background: var(--primary-gradient); color: white; border: none; transition: 0.3s; transform: scale(1);">
+                <span class="stat-value">QR</span>
+                <span class="stat-label" style="color: rgba(255,255,255,0.9); font-weight: 600;">Menu Designer</span>
+            </div>
         </div>
 
         <!-- QR Code Generator Section -->
-        <div class="card p-3 animate-fade-in" style="margin-bottom: 32px; border: 2px solid #E2E8F0; background: #FFF;">
+        <div id="qr-section" class="card p-3 animate-fade-in"
+            style="margin-bottom: 40px; border: 2px solid #E2E8F0; background: #FFF; scroll-margin-top: 20px;">
             <div class="flex flex-col items-center text-center">
-                <div
-                    style="background: var(--primary-gradient); color: white; padding: 12px 24px; border-radius: 50px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 24px;">
-                    Your Menu QR Code
-                </div>
+                <h3 class="font-extrabold mb-1" style="font-size: 1.4rem;">Scan & Order QR</h3>
 
                 <div id="qr-container"
-                    style="background: white; padding: 16px; border-radius: 20px; box-shadow: var(--shadow-md); margin-bottom: 20px;">
+                    style="background: white; padding: 16px; border-radius: 24px; box-shadow: var(--shadow-md); margin-bottom: 20px; border: 1px solid #F1F5F9;">
                     <div id="qrcode"></div>
                 </div>
 
