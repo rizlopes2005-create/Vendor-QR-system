@@ -423,6 +423,7 @@ let vendorOrders = [];
 
 async function initVendorDashboard() {
     loadVendorOrders();
+    generateVendorQR();
 
     const ws = new WebSocket(WS_URL);
     ws.onmessage = (event) => {
@@ -578,4 +579,118 @@ async function updateStatus(orderId, status) {
         // On error, reload to sync state
         loadVendorOrders();
     }
+}
+
+// --- QR CODE GENERATION LOGIC ---
+
+function generateVendorQR() {
+    const container = document.getElementById("qrcode");
+    if (!container) return;
+
+    container.innerHTML = "";
+    new QRCode(container, {
+        text: "https://vendor-qr-system-26.vercel.app/menu",
+        width: 256,
+        height: 256,
+        colorDark: "#1E293B",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+}
+
+function downloadQRCode() {
+    const container = document.getElementById("qrcode");
+    const img = container.querySelector("img");
+    const canvas = container.querySelector("canvas");
+
+    const dataUrl = img ? img.src : (canvas ? canvas.toDataURL("image/png") : null);
+
+    if (dataUrl) {
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "ArunBites_Vendor_QR.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+function printQRCode() {
+    const container = document.getElementById("qrcode");
+    const img = container.querySelector("img");
+    const canvas = container.querySelector("canvas");
+    const qrSrc = img ? img.src : (canvas ? canvas.toDataURL("image/png") : "");
+
+    if (!qrSrc) return;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Print Menu QR - Arun Bites</title>
+                <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+                <style>
+                    body { 
+                        display: flex; 
+                        flex-direction: column; 
+                        align-items: center; 
+                        justify-content: center; 
+                        height: 100vh; 
+                        font-family: 'Outfit', sans-serif; 
+                        text-align: center; 
+                        background: #F8FAFC;
+                        color: #1E293B;
+                    }
+                    .qr-card {
+                        background: white;
+                        padding: 40px;
+                        border-radius: 40px;
+                        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+                        border: 2px solid #E2E8F0;
+                    }
+                    img { 
+                        width: 400px; 
+                        height: 400px; 
+                        margin-bottom: 30px; 
+                        padding: 20px;
+                        background: white;
+                        border-radius: 20px;
+                    }
+                    h1 { 
+                        margin: 0; 
+                        font-size: 32px; 
+                        font-weight: 800;
+                        color: #FF4D00; 
+                    }
+                    p { 
+                        font-size: 18px; 
+                        color: #64748B; 
+                        margin-top: 10px; 
+                        font-weight: 600;
+                    }
+                    .url {
+                        margin-top: 20px;
+                        font-size: 14px;
+                        color: #94A3B8;
+                        text-transform: lowercase;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="qr-card">
+                    <h1>Scan to View Menu</h1>
+                    <p>Place your order directly from your phone!</p>
+                    <img src="${qrSrc}" />
+                    <div class="url">https://vendor-qr-system-26.vercel.app/menu</div>
+                </div>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        window.onafterprint = function() { window.close(); };
+                    }
+                </script>
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
 }
