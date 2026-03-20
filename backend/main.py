@@ -28,13 +28,19 @@ app.add_middleware(
 
 # WebSocket Manager
 
-# Auto-seed on startup if DB is empty
+# Auto-seed on startup if DB is empty or update broken images
 @app.on_event("startup")
 def startup_event():
     db = next(get_db())
     if db.query(models.MenuItem).count() == 0:
         print("Empty database detected. Auto-seeding...")
         seed_data(db)
+    else:
+        # Emergency update for Value Trio if it's broken
+        trio = db.query(models.MenuItem).filter(models.MenuItem.name == "Value Trio").first()
+        if trio:
+            trio.image_url = "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=400&q=80"
+            db.commit()
 
 # WebSocket Manager
 class ConnectionManager:
@@ -185,7 +191,7 @@ def seed_data(db: Session = Depends(get_db)):
         
         # Combos
         models.MenuItem(name="Family Feast", description="2 Burgers, 1 Pizza, 2 Drinks and Large Fries", price=599.0, category="Combos", image_url="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80"),
-        models.MenuItem(name="Value Trio", description="1 Wrap, 1 Snack and 1 Soft Drink", price=199.0, category="Combos", image_url="https://images.unsplash.com/photo-1606787366850-de6330128bfc?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Value Trio", description="1 Wrap, 1 Snack and 1 Soft Drink", price=199.0, category="Combos", image_url="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=400&q=80"),
     ]
     db.add_all(items)
     db.commit()
