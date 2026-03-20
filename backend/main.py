@@ -171,11 +171,11 @@ def seed_data(db: Session = Depends(get_db)):
     items = [
         # Burgers
         models.MenuItem(name="Beast Burger", description="Signature double patty with melting cheese and secret sauce", price=149.0, category="Burgers", image_url="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80"),
-        models.MenuItem(name="Mexi-Zing Burger", description="Spicy jalapeno patty with salsa and crunchy nachos", price=129.0, category="Burgers", image_url="mexi_zing_burger_item_1773810830391.png"),
-        models.MenuItem(name="Crispy Paneer Burger", description="Golden fried paneer slab with herb mayo", price=110.0, category="Burgers", image_url="crispy_paneer_burger_item_1773810860006.png"),
+        models.MenuItem(name="Mexi-Zing Burger", description="Spicy jalapeno patty with salsa and crunchy nachos", price=129.0, category="Burgers", image_url="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Crispy Paneer Burger", description="Golden fried paneer slab with herb mayo", price=110.0, category="Burgers", image_url="https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?auto=format&fit=crop&w=400&q=80"),
         
         # Pizzas
-        models.MenuItem(name="Supreme Symphony", description="Loaded with olives, capsicum, corn and premium mozzarella", price=299.0, category="Pizza", image_url="supreme_symphony_pizza_item_1773810880152.png"),
+        models.MenuItem(name="Supreme Symphony", description="Loaded with olives, capsicum, corn and premium mozzarella", price=299.0, category="Pizza", image_url="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80"),
         models.MenuItem(name="Pepperoni Paradise", description="Classic smoked pepperoni with extra cheese pulling delight", price=349.0, category="Pizza", image_url="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80"),
         models.MenuItem(name="Garden Fresh Pizza", description="Farm-picked vegetables with a thin crust base", price=249.0, category="Pizza", image_url="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80"),
         
