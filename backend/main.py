@@ -180,7 +180,7 @@ def seed_data(db: Session = Depends(get_db)):
         models.MenuItem(name="Garden Fresh Pizza", description="Farm-picked vegetables with a thin crust base", price=249.0, category="Pizza", image_url="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80"),
         
         # Rolls & Snacks
-        models.MenuItem(name="Peri-Peri Wrap", description="Juicy chicken/paneer wrap with spicy peri-peri dust", price=89.0, category="Rolls", image_url="https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&w=400&q=80"),
+        models.MenuItem(name="Peri-Peri Wrap", description="Juicy chicken/paneer wrap with spicy peri-peri dust", price=89.0, category="Rolls", image_url="https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=400&q=80"),
         models.MenuItem(name="Cheese Corn Balls", description="Melt-in-mouth cheesy centers with a crunchy exterior", price=75.0, category="Snacks", image_url="https://images.unsplash.com/photo-1605333396915-47ed6b68a00e?auto=format&fit=crop&w=400&q=80"),
         models.MenuItem(name="Loaded Nachos", description="Mexican nachos topped with beans, cheese and cream", price=120.0, category="Snacks", image_url="https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=400&q=80"),
         
