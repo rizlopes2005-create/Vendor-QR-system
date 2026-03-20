@@ -10,14 +10,14 @@
 </head>
 
 <body>
-    <header class="dashboard-header">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+    <header class="dashboard-header mb-4">
+        <div class="container flex justify-between items-center p-2">
             <div>
-                <h1 style="font-size: 1.8rem; font-weight: 800;">Vendor Dashboard</h1>
-                <p style="opacity: 0.8; font-size: 0.9rem;">Manage your live orders and track sales</p>
+                <h1 class="font-extrabold" style="font-size: 1.8rem;">Vendor Dashboard</h1>
+                <p class="text-muted" style="font-size: 0.9rem; opacity: 1;">Manage your live orders and track sales</p>
             </div>
-            <div id="connection-status"
-                style="background: #00B894; padding: 6px 16px; border-radius: 50px; text-transform: uppercase; font-weight: 800; font-size: 0.75rem; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);">
+            <div id="connection-status" class="badge"
+                style="background: #00B894; color: white; padding: 8px 16px; border-radius: 50px;">
                 ● Live</div>
         </div>
     </header>
@@ -40,7 +40,15 @@
 
         <h2 class="order-section-title">
             Incoming Orders
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
         </h2>
 
         <div id="vendor-order-list" class="status-grid">

@@ -25,16 +25,14 @@ function updateLocalStorage() {
 }
 
 function showToast(message) {
-    // Simple toast implementation
     const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-        background: #333; color: white; padding: 10px 20px; border-radius: 20px;
-        z-index: 9999; font-size: 0.9rem; animation: fadeIn 0.3s;
-    `;
+    toast.className = 'toast-msg';
     toast.innerText = message;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
 }
 
 // --- MENU PAGE LOGIC ---
@@ -56,15 +54,15 @@ async function loadMenu() {
 function renderMenu(items) {
     const container = document.getElementById('menu-container');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    const filtered = currentCategory === 'All' 
-        ? items 
+    const filtered = currentCategory === 'All'
+        ? items
         : items.filter(i => i.category === currentCategory);
 
     filtered.forEach(item => {
-        const finalImageUrl = (item.image_url.startsWith('http') || item.image_url.startsWith('data:')) 
-            ? item.image_url 
+        const finalImageUrl = (item.image_url.startsWith('http') || item.image_url.startsWith('data:'))
+            ? item.image_url
             : `images/${item.image_url}`;
 
         const card = document.createElement('div');
@@ -94,7 +92,7 @@ function renderCategories(items) {
 
     // Get unique categories
     const categories = ['All', ...new Set(items.map(i => i.category))];
-    
+
     // Icon mapping
     const icons = {
         'All': '🍽️',
@@ -127,8 +125,8 @@ function filterMenu(category) {
 
 function searchMenu(query) {
     const q = query.toLowerCase();
-    const filtered = window.menuItems.filter(item => 
-        item.name.toLowerCase().includes(q) || 
+    const filtered = window.menuItems.filter(item =>
+        item.name.toLowerCase().includes(q) ||
         item.description.toLowerCase().includes(q)
     );
     renderMenu(filtered);
@@ -137,7 +135,7 @@ function searchMenu(query) {
 function addToCart(itemId, event) {
     const item = window.menuItems.find(i => i.id === itemId);
     const existing = cart.find(c => c.id === itemId);
-    
+
     // Animation: Fly to cart
     if (event) {
         const btn = event.currentTarget || event.target;
@@ -150,11 +148,11 @@ function addToCart(itemId, event) {
     } else {
         cart.push({ ...item, quantity: 1 });
     }
-    
+
     updateLocalStorage();
     updateCartUI();
     showToast(`Added ${item.name} to cart`);
-    
+
     // Smart Suggestion
     if (item.category === 'Meals' || item.name.includes('Burger')) {
         showSuggestions(item);
@@ -195,12 +193,12 @@ function animateFlyToCart(img) {
 function showSuggestions(addedItem) {
     const overlay = document.getElementById('suggestion-overlay');
     if (!overlay) return;
-    
+
     const container = document.getElementById('suggestion-list');
     container.innerHTML = '';
-    
+
     // Simple logic: If meal, suggest drink. If drink, suggest snack.
-    const suggestions = window.menuItems.filter(i => 
+    const suggestions = window.menuItems.filter(i =>
         (addedItem.category === 'Meals' && i.category === 'Drinks') ||
         (addedItem.category === 'Drinks' && i.category === 'Snacks')
     ).slice(0, 2);
@@ -208,19 +206,19 @@ function showSuggestions(addedItem) {
     if (suggestions.length === 0) return;
 
     suggestions.forEach(s => {
-        const finalImageUrl = (s.image_url.startsWith('http') || s.image_url.startsWith('data:')) 
-            ? s.image_url 
+        const finalImageUrl = (s.image_url.startsWith('http') || s.image_url.startsWith('data:'))
+            ? s.image_url
             : `images/${s.image_url}`;
 
         const div = document.createElement('div');
-        div.style.cssText = 'display:flex; align-items:center; gap:15px; margin-bottom:15px; background:#F8FAFC; padding:10px; border-radius:15px; text-align:left;';
+        div.className = 'suggestion-item';
         div.innerHTML = `
-            <img src="${finalImageUrl}" style="width:50px; height:50px; border-radius:10px; object-fit:cover;">
+            <img src="${finalImageUrl}" class="suggestion-img">
             <div style="flex:1;">
                 <h4 style="font-size:0.9rem;">${s.name}</h4>
                 <p style="font-size:0.8rem; color:var(--primary); font-weight:700;">₹${s.price}</p>
             </div>
-            <button onclick="addToCart(${s.id}); closeSuggestions();" class="add-btn" style="width:30px; height:30px;">+</button>
+            <button onclick="addToCart(${s.id}); closeSuggestions();" class="add-btn" style="width:32px; height:32px;">+</button>
         `;
         container.appendChild(div);
     });
@@ -262,7 +260,7 @@ function renderCartPage() {
     const container = document.getElementById('cart-items-container');
     const emptyMsg = document.getElementById('empty-cart');
     const summary = document.getElementById('cart-summary');
-    
+
     if (!container) return;
 
     if (cart.length === 0) {
@@ -282,19 +280,16 @@ function renderCartPage() {
         total += itemTotal;
 
         const div = document.createElement('div');
-        div.className = 'card animate-fade-in';
-        div.style.padding = '12px';
+        div.className = 'cart-item animate-fade-in';
         div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h4 style="font-weight: 700;">${item.name}</h4>
-                    <p style="color: var(--primary); font-weight: 800; font-size: 0.9rem;">₹${item.price}</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 15px; background: #F0F0F0; padding: 5px 12px; border-radius: 10px;">
-                    <button onclick="changeQty(${item.id}, -1)" style="border:none; background:none; font-weight:800; padding:5px; cursor:pointer;">-</button>
-                    <span style="font-weight: 800;">${item.quantity}</span>
-                    <button onclick="changeQty(${item.id}, 1)" style="border:none; background:none; font-weight:800; padding:5px; cursor:pointer;">+</button>
-                </div>
+            <div>
+                <h4 style="font-weight: 700;">${item.name}</h4>
+                <p style="color: var(--primary); font-weight: 800; font-size: 0.9rem;">₹${item.price}</p>
+            </div>
+            <div class="qty-control">
+                <button onclick="changeQty(${item.id}, -1)" class="qty-btn">-</button>
+                <span style="font-weight: 800;">${item.quantity}</span>
+                <button onclick="changeQty(${item.id}, 1)" class="qty-btn">+</button>
             </div>
         `;
         container.appendChild(div);
@@ -313,7 +308,7 @@ function changeQty(id, delta) {
     if (cart[index].quantity <= 0) {
         cart.splice(index, 1);
     }
-    
+
     updateLocalStorage();
     renderCartPage();
 }
@@ -343,7 +338,7 @@ async function placeOrder() {
     const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     // If we are on payment page, payment_method must be UPI
     const method = window.location.href.includes('payment.html') ? 'UPI' : selectedPayment;
-    
+
     const payload = {
         total_amount: total,
         payment_method: method,
@@ -359,11 +354,11 @@ async function placeOrder() {
 
         if (!response.ok) throw new Error('Failed to place order');
         const order = await response.json();
-        
+
         // Clear cart
         cart = [];
         updateLocalStorage();
-        
+
         window.location.href = `confirmation.html?id=${order.id}`;
     } catch (err) {
         console.error(err);
@@ -382,9 +377,9 @@ async function trackOrder(orderId) {
         const steps = ['Pending', 'Preparing', 'Ready'];
         const line = document.querySelector('.tracker-line-progress');
         const currentIdx = steps.indexOf(status);
-        
+
         if (line) line.style.width = `${(currentIdx / (steps.length - 1)) * 100}%`;
-        
+
         document.querySelectorAll('.tracker-step').forEach((step, idx) => {
             step.classList.toggle('active', idx === currentIdx);
             step.classList.toggle('completed', idx < currentIdx);
@@ -404,7 +399,7 @@ async function trackOrder(orderId) {
         const res = await fetch(`${API_URL}/orders/${orderId}`);
         const order = await res.json();
         updateUI(order);
-    } catch(e) {}
+    } catch (e) { }
 
     // Listen for real-time status updates via WebSocket
     const ws = new WebSocket(WS_URL);
@@ -434,7 +429,7 @@ async function initVendorDashboard() {
         const data = JSON.parse(event.data);
         if (data.type === 'NEW_ORDER') {
             vendorOrders.unshift(data.order);
-            document.getElementById('order-sound').play().catch(() => {});
+            document.getElementById('order-sound').play().catch(() => { });
             renderVendorOrders();
         } else if (data.type === 'STATUS_UPDATE') {
             const order = vendorOrders.find(o => o.id === data.order_id);
@@ -451,7 +446,7 @@ async function loadVendorOrders() {
         const response = await fetch(`${API_URL}/orders`);
         vendorOrders = await response.json();
         renderVendorOrders();
-    } catch(e) {
+    } catch (e) {
         console.error("Dashboard failed to load orders", e);
     }
 }
@@ -466,12 +461,12 @@ function renderVendorOrders() {
     }
 
     container.innerHTML = '';
-    
+
     // Stats
     document.getElementById('stats-orders').innerText = vendorOrders.length;
     const todaySales = vendorOrders.reduce((sum, o) => o.status !== 'Cancelled' ? sum + o.total_amount : sum, 0);
     document.getElementById('stats-sales').innerText = `₹${todaySales}`;
-    
+
     // Filter active orders (remove Ready, Delivered and Cancelled from main vendor view)
     const activeOrders = vendorOrders.filter(o => o.status !== 'Ready' && o.status !== 'Delivered' && o.status !== 'Cancelled');
     document.getElementById('order-count-badge').innerText = activeOrders.length;
@@ -488,13 +483,13 @@ function renderVendorOrders() {
     }
 
     container.innerHTML = '';
-    
+
     activeOrders.forEach(order => {
         const card = document.createElement('div');
         card.className = `order-card animate-fade-in ${order.is_priority ? 'priority' : ''}`;
         card.id = `order-${order.id}`;
         card.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        
+
         const itemsHtml = order.items.map(i => `
             <div class="order-item-row">
                 <span>${i.quantity}x ${i.menu_item.name}</span>
@@ -551,19 +546,19 @@ function renderVendorOrders() {
 
 async function updateStatus(orderId, status) {
     const card = document.getElementById(`order-${orderId}`);
-    
+
     // Optimistically update local state for immediate feedback
     const order = vendorOrders.find(o => o.id === orderId);
     if (order) {
         order.status = status;
-        
+
         // If it's a "terminal" status for the vendor view, animate removal
         if (status === 'Ready' || status === 'Delivered' || status === 'Cancelled') {
             if (card) {
                 card.style.opacity = '0';
                 card.style.transform = 'scale(0.9) translateY(20px)';
                 card.style.pointerEvents = 'none';
-                
+
                 setTimeout(() => {
                     renderVendorOrders();
                 }, 400); // Match CSS transition
@@ -578,7 +573,7 @@ async function updateStatus(orderId, status) {
     try {
         const response = await fetch(`${API_URL}/orders/${orderId}/status?status=${status}`, { method: 'PATCH' });
         if (!response.ok) throw new Error("Update failed");
-    } catch(e) {
+    } catch (e) {
         console.error("Status update failed", e);
         // On error, reload to sync state
         loadVendorOrders();

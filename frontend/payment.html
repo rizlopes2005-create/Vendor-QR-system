@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,50 +8,60 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
+
 <body style="background: #F8FAFC;">
-    <div class="container animate-fade-in" style="max-width: 500px; padding-top: 40px; padding-bottom: 40px; text-align: center;">
-        
-        <div style="margin-bottom: 30px;">
-            <h1 style="font-weight: 800; font-size: 1.8rem; margin-bottom: 10px;">Complete Payment</h1>
-            <p style="color: var(--text-muted);">Please scan and pay the exact amount below</p>
+    <div class="container animate-fade-in h-screen-mobile text-center" style="max-width: 500px;">
+
+        <div class="mb-4 mt-2">
+            <h1 class="font-extrabold mb-1" style="font-size: 1.8rem;">Complete Payment</h1>
+            <p class="text-muted">Please scan and pay the exact amount below</p>
         </div>
 
-        <div class="card" style="padding: 0; overflow: hidden; border: none; box-shadow: var(--shadow-lg);">
-            <div style="background: var(--secondary); color: white; padding: 25px;">
-                <p style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px;">Total Payable</p>
-                <h2 style="font-size: 2.5rem; font-weight: 800;">₹<span id="payment-amount">0</span></h2>
+        <div class="card p-0 w-full-mobile shadow-lg" style="overflow: hidden; border: none;">
+            <div class="p-3" style="background: var(--secondary); color: white;">
+                <p style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; opacity: 0.8;"
+                    class="mb-1">Total Payable</p>
+                <h2 style="font-size: 2.5rem;" class="font-extrabold">₹<span id="payment-amount">0</span></h2>
             </div>
-            
-            <div style="padding: 30px; background: white;">
-                <div style="background: #F1F5F9; padding: 15px; border-radius: 15px; margin-bottom: 25px;">
-                    <img src="payment_qr.jpg" alt="UPI QR" style="width: 100%; max-width: 250px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+
+            <div class="p-3 bg-white">
+                <div class="mb-3 p-2" style="background: #F1F5F9; border-radius: 15px;">
+                    <img src="payment_qr.jpg" alt="UPI QR" class="w-full"
+                        style="max-width: 250px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 </div>
 
-                <div style="margin-bottom: 25px;">
-                    <p style="font-weight: 700; color: var(--primary); font-size: 1.1rem; margin-bottom: 5px;">UPI ID: vendor@okaxis</p>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">Accepted via GPay, PhonePe, Paytm, etc.</p>
+                <div class="mb-3">
+                    <p class="font-bold text-primary mb-1" style="font-size: 1.1rem;">UPI ID: vendor@okaxis</p>
+                    <p style="font-size: 0.85rem;" class="text-muted">Accepted via GPay, PhonePe, Paytm, etc.</p>
                 </div>
 
-                <div style="margin-bottom: 25px; display: flex; align-items: flex-start; gap: 12px; text-align: left; padding: 0 10px;">
-                    <input type="checkbox" id="payment-checkbox" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); margin-top: 2px;" onchange="document.getElementById('confirm-payment-btn').disabled = !this.checked">
-                    <label for="payment-checkbox" style="font-size: 0.9rem; color: var(--text-main); font-weight: 600; cursor: pointer; line-height: 1.4;">
-                        I confirm that I have scanned the QR and paid the total amount of ₹<span class="pay-amount-label">0</span>
+                <div class="mb-3 flex items-center gap-1 text-center" style="text-align: left; padding: 0 10px;">
+                    <input type="checkbox" id="payment-checkbox"
+                        style="width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0;"
+                        onchange="document.getElementById('confirm-payment-btn').disabled = !this.checked">
+                    <label for="payment-checkbox"
+                        style="font-size: 0.9rem; font-weight: 600; cursor: pointer; line-height: 1.4;">
+                        I confirm that I have scanned the QR and paid ₹<span class="pay-amount-label">0</span>
                     </label>
                 </div>
 
-                <button class="btn btn-primary" id="confirm-payment-btn" onclick="finalizeUpiOrder()" disabled title="Please confirm payment first">
+                <button class="btn btn-primary" id="confirm-payment-btn" onclick="finalizeUpiOrder()" disabled
+                    title="Please confirm payment first">
                     I Have Paid - Place Order
                 </button>
-                
-                <button class="btn btn-outline" onclick="window.location.href='cart.html'" style="margin-top: 15px; border: none; color: var(--text-muted); font-size: 0.9rem;">
+
+                <button class="btn btn-outline mt-2" onclick="window.location.href='cart.html'"
+                    style="border: none; color: var(--text-muted); font-size: 0.9rem;">
                     Back to Selection
                 </button>
             </div>
         </div>
-        
+
         <div style="margin-top: 40px; display: flex; justify-content: center; gap: 20px; opacity: 0.5;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo.png/1200px-UPI-Logo.png" alt="UPI" height="20">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Google_Pay_Logo.svg/1024px-Google_Pay_Logo.svg.png" alt="GPay" height="20">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo.png/1200px-UPI-Logo.png"
+                alt="UPI" height="20">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Google_Pay_Logo.svg/1024px-Google_Pay_Logo.svg.png"
+                alt="GPay" height="20">
         </div>
     </div>
 
@@ -71,11 +82,12 @@
             const btn = document.getElementById('confirm-payment-btn');
             btn.disabled = true;
             btn.innerText = 'Confirming Order...';
-            
+
             // In a real app, we might check an API for payment confirmation
             // Here we proceed to place the order
             await placeOrder();
         }
     </script>
 </body>
+
 </html>

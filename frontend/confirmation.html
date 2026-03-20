@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,17 +8,20 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="container animate-fade-in" style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-        
-        <div style="font-size: 5rem; margin-bottom: 20px;">✅</div>
-        <h1 style="font-weight: 800; margin-bottom: 5px;">Order Placed!</h1>
-        <p style="color: var(--text-muted); margin-bottom: 30px;">Your food is being prepared with love.</p>
 
-        <div class="card" style="width: 100%; padding: 30px;">
-            <p style="font-weight: 600; text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px;">Your Token Number</p>
-            <h2 style="font-size: 4rem; font-weight: 800; color: var(--primary); margin: 5px 0;" id="order-token">--</h2>
-            
+<body>
+    <div class="container animate-fade-in h-screen-mobile flex flex-col items-center text-center">
+
+        <div style="font-size: 5rem;" class="mb-2">✅</div>
+        <h1 class="font-extrabold mb-1">Order Placed!</h1>
+        <p class="text-muted mb-4">Your food is being prepared with love.</p>
+
+        <div class="card w-full p-3 shadow-lg">
+            <p style="font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;"
+                class="text-muted">Your Token Number</p>
+            <h2 style="font-size: 4rem; color: var(--primary); margin: 5px 0;" class="font-extrabold" id="order-token">
+                --</h2>
+
             <!-- Progress Tracker -->
             <div class="tracker-container">
                 <div class="tracker-line">
@@ -37,17 +41,19 @@
                 </div>
             </div>
 
-            <div style="margin: 20px 0; padding-top: 20px; border-top: 1px dashed #EEE;">
-                <p style="font-weight: 600;">Status: <span id="order-status" class="badge badge-pending">Order Received</span></p>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Wait Time: <span id="wait-time">~10 mins</span></p>
+            <div class="mt-2" style="padding-top: 20px; border-top: 1px dashed #EEE;">
+                <p style="font-weight: 600;">Status: <span id="order-status" class="badge badge-pending">Order
+                        Received</span></p>
+                <p style="font-size: 0.85rem; margin-top: 10px;" class="text-muted">Wait Time: <span id="wait-time">~10
+                        mins</span></p>
             </div>
         </div>
 
-        <button class="btn btn-secondary" onclick="window.location.href='menu.html'" style="margin-top: 20px;">
+        <button class="btn btn-secondary mt-2" onclick="window.location.href='menu.html'">
             Order More
         </button>
-        
-        <p style="margin-top: 40px; font-size: 0.8rem; color: var(--text-muted);">
+
+        <p class="mt-4 text-muted" style="font-size: 0.8rem;">
             Please show your token to the vendor when your status is <strong>READY</strong>.
         </p>
     </div>
@@ -63,4 +69,5 @@
         });
     </script>
 </body>
+
 </html>

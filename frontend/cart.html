@@ -21,47 +21,47 @@
         </div>
     </header>
 
-    <div class="container animate-fade-in">
-        <h1 style="margin-bottom: 20px; font-weight: 800;">My Cart</h1>
+    <div class="container animate-fade-in mb-4">
+        <h1 class="mb-2 font-extrabold">My Cart</h1>
 
         <div id="cart-items-container">
             <!-- Cart items will be loaded here -->
         </div>
 
-        <div id="empty-cart" style="display: none; text-align: center; padding: 60px 20px;">
-            <div style="font-size: 4rem; margin-bottom: 20px;">🛒</div>
-            <h2 style="margin-bottom: 10px;">Your cart is empty</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px;">Add some tasty street food to get started!</p>
+        <div id="empty-cart" class="text-center p-4 mt-4" style="display: none;">
+            <div style="font-size: 4rem;" class="mb-2">🛒</div>
+            <h2 class="mb-1">Your cart is empty</h2>
+            <p class="text-muted mb-2">Add some tasty street food to get started!</p>
             <button class="btn btn-primary" onclick="window.location.href='menu.html'">Browse Menu</button>
         </div>
 
-        <div id="cart-summary" style="margin-top: 30px; display: none;">
-            <div class="card" style="padding: 20px;">
-                <div
-                    style="display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--text-muted);">
+        <div id="cart-summary" class="mt-2" style="display: none;">
+            <div class="card p-2">
+                <div class="flex justify-between mb-1 text-muted">
                     <span>Subtotal</span>
                     <span id="subtotal">₹0</span>
                 </div>
-                <div
-                    style="display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: 800; font-size: 1.2rem; border-top: 1px dashed #DDD; padding-top: 10px;">
+                <div class="flex justify-between mb-2 font-extrabold"
+                    style="font-size: 1.2rem; border-top: 1px dashed #DDD; padding-top: 10px;">
                     <span>Total</span>
                     <span id="total">₹0</span>
                 </div>
 
-                <h3 style="margin-bottom: 15px; font-size: 1rem;">Payment Method</h3>
+                <h3 class="mb-1" style="font-size: 1rem;">Payment Method</h3>
                 <div class="payment-methods">
                     <div class="method-card active" id="method-cash" onclick="selectPayment('Cash')">
-                        <div style="font-size: 1.5rem; margin-bottom: 5px;">💵</div>
+                        <div style="font-size: 1.5rem;" class="mb-1">💵</div>
                         <div style="font-weight: 600; font-size: 0.9rem;">Cash</div>
                     </div>
                     <div class="method-card" id="method-upi" onclick="selectPayment('UPI')">
-                        <div style="font-size: 1.5rem; margin-bottom: 5px;">📱</div>
+                        <div style="font-size: 1.5rem;" class="mb-1">📱</div>
                         <div style="font-weight: 600; font-size: 0.9rem;">UPI</div>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 25px; padding: 15px; background: #F8FAFC; border-radius: 12px; border: 1px dashed #E2E8F0;">
-                    <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+                <div class="mb-2 p-2 bg-white"
+                    style="border-radius: 12px; border: 1px dashed #E2E8F0; background: #F8FAFC !important;">
+                    <p style="font-size: 0.85rem;" class="text-muted text-center">
                         Orders paid via <strong>Cash</strong> are placed immediately.<br>
                         <strong>UPI</strong> orders will lead to a secure payment page.
                     </p>
