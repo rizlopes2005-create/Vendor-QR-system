@@ -581,7 +581,18 @@ async function updateStatus(orderId, status) {
     }
 }
 
-// --- QR CODE GENERATION LOGIC ---
+function openQRModal() {
+    const modal = document.getElementById('qr-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        generateVendorQR();
+    }
+}
+
+function closeQRModal() {
+    const modal = document.getElementById('qr-modal');
+    if (modal) modal.style.display = 'none';
+}
 
 function generateVendorQR() {
     const container = document.getElementById("qrcode");

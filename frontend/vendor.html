@@ -37,44 +37,30 @@
                 <span class="stat-label">Pending</span>
             </div>
             <!-- QR Shortcut Button in Stats Grid -->
-            <div class="stat-card" onclick="document.getElementById('qr-section').scrollIntoView({behavior: 'smooth'})"
+            <div class="stat-card" onclick="openQRModal()"
                 style="cursor: pointer; background: var(--primary-gradient); color: white; border: none; transition: 0.3s; transform: scale(1);">
                 <span class="stat-value">QR</span>
-                <span class="stat-label" style="color: rgba(255,255,255,0.9); font-weight: 600;">Menu Designer</span>
+                <span class="stat-label" style="color: rgba(255,255,255,0.9); font-weight: 600;">Vendors QR</span>
             </div>
         </div>
 
-        <!-- QR Code Generator Section -->
-        <div id="qr-section" class="card p-3 animate-fade-in"
-            style="margin-bottom: 40px; border: 2px solid #E2E8F0; background: #FFF; scroll-margin-top: 20px;">
-            <div class="flex flex-col items-center text-center">
-                <h3 class="font-extrabold mb-1" style="font-size: 1.4rem;">Scan & Order QR</h3>
+        <!-- Hidden QR Modal -->
+        <div id="qr-modal" class="suggestion-overlay"
+            style="display: none; align-items: center; justify-content: center; z-index: 5000;">
+            <div class="suggestion-card animate-fade-in" style="max-width: 400px; padding: 40px; position: relative;">
+                <button onclick="closeQRModal()"
+                    style="position: absolute; top: 15px; right: 20px; border: none; background: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+
+                <h3 class="font-extrabold mb-1" style="font-size: 1.6rem; color: var(--text-main);">Vendors QR Code</h3>
+                <p class="text-muted mb-3" style="font-size: 0.9rem;">Scan to view live menu</p>
 
                 <div id="qr-container"
-                    style="background: white; padding: 16px; border-radius: 24px; box-shadow: var(--shadow-md); margin-bottom: 20px; border: 1px solid #F1F5F9;">
+                    style="background: white; padding: 20px; border-radius: 24px; box-shadow: var(--shadow-md); margin-bottom: 24px; border: 1px solid #F1F5F9; display: inline-block;">
                     <div id="qrcode"></div>
                 </div>
 
-                <p class="text-muted mb-2" style="font-weight: 600; font-size: 0.95rem;">
-                    “Customers can scan this QR code to open the menu and place orders.”
-                </p>
-                <p id="qr-url" style="font-size: 0.8rem; color: var(--primary); font-weight: 700; margin-bottom: 24px;">
-                    https://vendor-qr-system-26.vercel.app/menu
-                </p>
-
-                <div class="flex gap-2 w-full-mobile" style="justify-content: center;">
-                    <button class="btn btn-primary" onclick="downloadQRCode()" style="width: auto; padding: 12px 24px;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                            style="margin-right: 8px;">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Download PNG
-                    </button>
-                    <button class="btn btn-secondary" onclick="printQRCode()"
-                        style="width: auto; padding: 12px 24px; background: var(--secondary);">
+                <div class="flex flex-col gap-2">
+                    <button class="btn btn-primary" onclick="printQRCode()" style="width: 100%;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
                             style="margin-right: 8px;">
@@ -82,8 +68,10 @@
                             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                             <rect x="6" y="14" width="12" height="8"></rect>
                         </svg>
-                        Print QR
+                        Print QR Code
                     </button>
+                    <button class="btn btn-outline" onclick="closeQRModal()"
+                        style="border: none; color: var(--text-muted);">Close</button>
                 </div>
             </div>
         </div>
