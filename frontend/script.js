@@ -67,10 +67,11 @@ function renderMenu(items) {
             : `images/${item.image_url}`;
 
         const card = document.createElement('div');
-        card.className = 'food-card animate-fade-in';
+        card.className = `food-card animate-fade-in ${!item.is_available ? 'sold-out' : ''}`;
         card.innerHTML = `
             <div class="food-img-container">
                 <img src="${finalImageUrl}" class="food-img" alt="${item.name}">
+                ${!item.is_available ? '<div class="sold-out-badge">Sold Out</div>' : ''}
             </div>
             <div class="food-details">
                 <h3>${item.name}</h3>
@@ -78,9 +79,15 @@ function renderMenu(items) {
             </div>
             <div class="food-card-footer">
                 <span class="food-price">₹${item.price}</span>
-                <div class="add-btn" onclick="addToCart(${item.id}, event)">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </div>
+                ${item.is_available ? `
+                    <div class="add-btn" onclick="addToCart(${item.id}, event)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </div>
+                ` : `
+                    <div class="add-btn disabled" title="Currently unavailable">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </div>
+                `}
             </div>
         `;
         container.appendChild(card);
@@ -424,6 +431,7 @@ let vendorOrders = [];
 
 async function initVendorDashboard() {
     loadVendorOrders();
+    loadMenuForManagement();
     generateVendorQR();
     
     // Refresh QR code every 30 seconds with a visual countdown
@@ -596,6 +604,45 @@ async function updateStatus(orderId, status) {
         console.error("Status update failed", e);
         // On error, reload to sync state
         loadVendorOrders();
+    }
+}
+
+async function loadMenuForManagement() {
+    try {
+        const response = await fetch(`${API_URL}/menu`);
+        const items = await response.json();
+        renderMenuManagement(items);
+    } catch (e) {
+        console.error("Failed to load menu for management", e);
+    }
+}
+
+function renderMenuManagement(items) {
+    const container = document.getElementById('vendor-menu-management');
+    if (!container) return;
+
+    container.innerHTML = items.map(item => `
+        <div class="menu-manage-item ${item.is_available ? '' : 'sold-out'}" onclick="toggleItemAvailability(${item.id}, ${item.is_available})">
+            <img src="${item.image_url.startsWith('http') ? item.image_url : 'images/' + item.image_url}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;">
+            <div style="font-size: 0.75rem; font-weight: 700; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 60px; text-align: center;">${item.name}</div>
+            <div style="font-size: 0.65rem; color: ${item.is_available ? 'var(--success)' : 'var(--primary)'}; font-weight: 800;">
+                ${item.is_available ? 'Available' : 'Sold Out'}
+            </div>
+        </div>
+    `).join('');
+}
+
+async function toggleItemAvailability(itemId, currentStatus) {
+    try {
+        const newStatus = !currentStatus;
+        const response = await fetch(`${API_URL}/menu/${itemId}/availability?is_available=${newStatus}`, { method: 'PATCH' });
+        if (response.ok) {
+            loadMenuForManagement();
+            // Optional: Show toast
+            showToast(`Item marked as ${newStatus ? 'Available' : 'Sold Out'}`);
+        }
+    } catch (e) {
+        console.error("Toggle failed", e);
     }
 }
 

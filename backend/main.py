@@ -79,6 +79,15 @@ def add_menu_item(item: schemas.MenuItemCreate, db: Session = Depends(get_db)):
     db.refresh(new_item)
     return new_item
 
+@app.patch("/menu/{item_id}/availability")
+def toggle_menu_item_availability(item_id: int, is_available: bool, db: Session = Depends(get_db)):
+    item = db.query(models.MenuItem).filter(models.MenuItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    item.is_available = is_available
+    db.commit()
+    return {"message": "Availability updated", "is_available": item.is_available}
+
 @app.post("/orders", response_model=schemas.Order)
 async def create_order(order_data: schemas.OrderCreate, db: Session = Depends(get_db)):
     # Calculate token number
