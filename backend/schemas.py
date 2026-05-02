@@ -58,3 +58,14 @@ class Vendor(VendorBase):
     id: int
     class Config:
         from_attributes = True
+
+class RatingCreate(BaseModel):
+    order_id: int
+    stars: int
+    comment: Optional[str] = None
+
+class Rating(RatingCreate):
+    id: int
+    timestamp: datetime
+    class Config:
+        from_attributes = True

@@ -181,6 +181,14 @@ def get_top_items(db: Session = Depends(get_db)):
     
     return [{"name": item[0], "count": item[1]} for item in top_items]
 
+@app.post("/ratings")
+def create_rating(rating: schemas.RatingCreate, db: Session = Depends(get_db)):
+    new_rating = models.Rating(**rating.dict())
+    db.add(new_rating)
+    db.commit()
+    db.refresh(new_rating)
+    return new_rating
+
 # WebSocket Route
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

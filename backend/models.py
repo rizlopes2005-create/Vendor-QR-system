@@ -41,3 +41,11 @@ class OrderItem(Base):
     
     order = relationship("Order", back_populates="items")
     menu_item = relationship("MenuItem")
+
+class Rating(Base):
+    __tablename__ = "ratings"
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("orders.id"))
+    stars = Column(Integer) # 1-5
+    comment = Column(String, nullable=True)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)

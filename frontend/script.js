@@ -406,6 +406,12 @@ async function trackOrder(orderId) {
         statusEl.innerText = order.status;
         statusEl.className = `badge badge-${order.status.toLowerCase()}`;
         updateProgress(order.status);
+        
+        // Reveal feedback section if order is completed
+        if (order.status === 'Ready' || order.status === 'Delivered') {
+            const feedbackSec = document.getElementById('feedback-section');
+            if (feedbackSec) feedbackSec.style.display = 'block';
+        }
     };
 
     // Initial load
@@ -430,8 +436,10 @@ async function trackOrder(orderId) {
             statusEl.innerText = data.status;
             statusEl.className = `badge badge-${data.status.toLowerCase()}`;
             updateProgress(data.status);
-            if (data.status === 'Ready') {
+            if (data.status === 'Ready' || data.status === 'Delivered') {
                 showToast("Your food is ready for pickup!");
+                const feedbackSec = document.getElementById('feedback-section');
+                if (feedbackSec) feedbackSec.style.display = 'block';
             }
         }
     };
@@ -824,4 +832,45 @@ function printQRCode() {
         </html>
     `);
     printWindow.document.close();
+}
+
+// --- FEEDBACK LOGIC ---
+let selectedRating = 0;
+
+function setRating(stars) {
+    selectedRating = stars;
+    const starElements = document.querySelectorAll('.star');
+    starElements.forEach((s, idx) => {
+        s.innerText = idx < stars ? '⭐' : '☆';
+        s.style.color = idx < stars ? '#FFD700' : '#CBD5E1';
+    });
+    
+    const submitBtn = document.getElementById('submit-feedback');
+    if (submitBtn) submitBtn.style.display = 'inline-block';
+}
+
+async function submitFeedback() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('id');
+    
+    if (!orderId || selectedRating === 0) return;
+
+    try {
+        const response = await fetch(`${API_URL}/ratings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                order_id: parseInt(orderId),
+                stars: selectedRating
+            })
+        });
+
+        if (response.ok) {
+            document.getElementById('feedback-section').innerHTML = `
+                <p style="color: var(--success); font-weight: 700;">Thank you for your feedback! ❤️</p>
+            `;
+        }
+    } catch (e) {
+        console.error("Failed to submit feedback", e);
+    }
 }

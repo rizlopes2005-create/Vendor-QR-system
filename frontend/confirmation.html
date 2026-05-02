@@ -47,6 +47,19 @@
                 <p style="font-size: 0.85rem; margin-top: 10px;" class="text-muted">Wait Time: <span id="wait-time">~10
                         mins</span></p>
             </div>
+
+            <!-- Feedback Section (Hidden by default) -->
+            <div id="feedback-section" style="display: none; padding-top: 20px; border-top: 1px dashed #EEE; margin-top: 20px;">
+                <p style="font-weight: 700; margin-bottom: 10px;">How was your food? ⭐</p>
+                <div style="display: flex; justify-content: center; gap: 10px; font-size: 1.5rem; margin-bottom: 15px;">
+                    <span onclick="setRating(1)" class="star" style="cursor: pointer;">☆</span>
+                    <span onclick="setRating(2)" class="star" style="cursor: pointer;">☆</span>
+                    <span onclick="setRating(3)" class="star" style="cursor: pointer;">☆</span>
+                    <span onclick="setRating(4)" class="star" style="cursor: pointer;">☆</span>
+                    <span onclick="setRating(5)" class="star" style="cursor: pointer;">☆</span>
+                </div>
+                <button id="submit-feedback" class="btn btn-primary" onclick="submitFeedback()" style="display: none; padding: 10px; font-size: 0.9rem;">Submit Review</button>
+            </div>
         </div>
 
         <button class="btn btn-secondary mt-2" onclick="window.location.href='menu.html'">
