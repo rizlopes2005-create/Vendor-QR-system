@@ -444,6 +444,7 @@ let vendorOrders = [];
 async function initVendorDashboard() {
     loadVendorOrders();
     loadMenuForManagement();
+    loadTopItems();
     generateVendorQR();
     
     // Refresh QR code every 30 seconds with a visual countdown
@@ -656,6 +657,32 @@ async function toggleItemAvailability(itemId, currentStatus) {
     } catch (e) {
         console.error("Toggle failed", e);
     }
+}
+
+async function loadTopItems() {
+    try {
+        const response = await fetch(`${API_URL}/analytics/top-items`);
+        const data = await response.json();
+        renderTopItems(data);
+    } catch (e) { }
+}
+
+function renderTopItems(data) {
+    const container = document.getElementById('top-items-list');
+    if (!container) return;
+
+    if (data.length === 0) {
+        container.innerHTML = '<span style="font-size: 0.8rem; opacity: 0.7;">No data yet.</span>';
+        return;
+    }
+
+    container.innerHTML = data.map((item, idx) => `
+        <div style="background: rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); min-width: 100px;">
+            <div style="font-size: 1.1rem; margin-bottom: 2px;">${idx === 0 ? '👑' : '🔥'}</div>
+            <div style="font-size: 0.85rem; font-weight: 700; white-space: nowrap;">${item.name}</div>
+            <div style="font-size: 0.75rem; opacity: 0.8;">${item.count} orders</div>
+        </div>
+    `).join('');
 }
 
 function openQRModal() {

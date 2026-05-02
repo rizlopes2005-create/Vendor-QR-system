@@ -170,6 +170,17 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
+@app.get("/analytics/top-items")
+def get_top_items(db: Session = Depends(get_db)):
+    # Simple count of items in order_items
+    from sqlalchemy import func
+    top_items = db.query(
+        models.MenuItem.name, 
+        func.count(models.OrderItem.id).label('total_ordered')
+    ).join(models.OrderItem).group_by(models.MenuItem.name).order_by(desc('total_ordered')).limit(5).all()
+    
+    return [{"name": item[0], "count": item[1]} for item in top_items]
+
 # WebSocket Route
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
