@@ -1,6 +1,7 @@
 // Detect if running locally or on deployed site
 const hostname = window.location.hostname;
-const IS_LOCAL = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.');
+const IS_VERCEL = hostname.includes('vercel.app');
+const IS_LOCAL = !IS_VERCEL && (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.'));
 
 // 🔴 YOUR RENDER BACKEND URL
 const PROD_BACKEND_URL = 'https://vendor-qr-system-1.onrender.com';
