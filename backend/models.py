@@ -29,6 +29,7 @@ class Order(Base):
     status = Column(String, default="Pending") # Pending, Accepted, Preparing, Ready, Delivered, Cancelled
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     is_priority = Column(Boolean, default=False)
+    is_loyalty_boosted = Column(Boolean, default=False)
     
     items = relationship("OrderItem", back_populates="order")
 

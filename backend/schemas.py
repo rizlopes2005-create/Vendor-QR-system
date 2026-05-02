@@ -37,6 +37,7 @@ class OrderBase(BaseModel):
 
 class OrderCreate(OrderBase):
     items: List[OrderItemCreate]
+    is_loyalty_boosted: bool = False
 
 class Order(OrderBase):
     id: int
@@ -44,6 +45,7 @@ class Order(OrderBase):
     status: str
     timestamp: datetime
     is_priority: bool
+    is_loyalty_boosted: bool
     items: List[OrderItem]
     
     class Config:

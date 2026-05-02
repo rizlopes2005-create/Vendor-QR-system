@@ -358,7 +358,8 @@ async function placeOrder() {
     const payload = {
         total_amount: total,
         payment_method: method,
-        items: cart.map(i => ({ menu_item_id: i.id, quantity: i.quantity }))
+        items: cart.map(i => ({ menu_item_id: i.id, quantity: i.quantity })),
+        is_loyalty_boosted: parseInt(localStorage.getItem('loyalty_stamps') || '0') >= 5
     };
 
     try {
@@ -570,11 +571,14 @@ function renderVendorOrders() {
                 ${itemsHtml}
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">${order.payment_method}</span>
-                <span style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);">Total: ₹${order.total_amount}</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+                ${order.payment_method === 'UPI' ? '<span style="background:#EBF8FF; color:#2B6CB0; padding:4px 8px; border-radius:6px; font-size:0.65rem; font-weight:800; border:1px solid #BEE3F8;">💳 UPI</span>' : ''}
+                ${order.items.reduce((s, i) => s + i.quantity, 0) <= 2 ? '<span style="background:#F0FFF4; color:#2F855A; padding:4px 8px; border-radius:6px; font-size:0.65rem; font-weight:800; border:1px solid #C6F6D5;">⚡ FAST TRACK</span>' : ''}
+                ${order.is_loyalty_boosted ? '<span style="background:#FAF5FF; color:#6B46C1; padding:4px 8px; border-radius:6px; font-size:0.65rem; font-weight:800; border:1px solid #E9D8FD;">👑 LOYALTY</span>' : ''}
+                <span style="background:#F7FAFC; color:#4A5568; padding:4px 8px; border-radius:6px; font-size:0.65rem; font-weight:800; border:1px solid #EDF2F7;">💰 ₹${order.total_amount}</span>
             </div>
 
+            <div style="display: flex; gap: 10px;">
             ${order.is_priority ? `
                 <div style="background: #FFF5F5; padding: 10px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: #D63031; border: 1px solid #FED7D7;">
                     <span style="font-size: 1.2rem;">★</span>

@@ -108,7 +108,8 @@ async def create_order(order_data: schemas.OrderCreate, db: Session = Depends(ge
         token_number=token_number,
         total_amount=order_data.total_amount,
         payment_method=order_data.payment_method,
-        status="Pending"
+        status="Pending",
+        is_loyalty_boosted=order_data.is_loyalty_boosted
     )
     
     # Add items to the relationship immediately
@@ -137,12 +138,35 @@ async def create_order(order_data: schemas.OrderCreate, db: Session = Depends(ge
 
 @app.get("/orders", response_model=List[schemas.Order])
 def get_orders(db: Session = Depends(get_db)):
-    # FIX: Use .desc() on status check and preload items to avoid lazy load issues
-    return db.query(models.Order).options(joinedload(models.Order.items)).order_by(
-        desc(models.Order.status == "Pending"), 
-        models.Order.is_priority.desc(), 
-        models.Order.timestamp.asc()
-    ).all()
+    # Advanced Smart-Queue V1 Logic:
+    # 1. Group by Active vs Completed (Pending/Preparing first)
+    # 2. Within active, sort by Weighted Priority Score:
+    #    Score = (Minutes Waiting * 10) + (UPI Boost 50) + (Small Order Boost 30) + (Loyalty Boost 40)
+    
+    from datetime import datetime, timezone
+    all_orders = db.query(models.Order).options(joinedload(models.Order.items)).all()
+    
+    def get_score(order):
+        if order.status not in ["Pending", "Preparing"]:
+            return -1000 # Put completed/cancelled at the bottom
+            
+        wait_time = (datetime.now(timezone.utc) - order.timestamp.replace(tzinfo=timezone.utc)).total_seconds() / 60
+        score = wait_time * 10
+        
+        if order.payment_method == "UPI":
+            score += 50
+        
+        if sum(i.quantity for i in order.items) <= 2:
+            score += 30
+            
+        if order.is_loyalty_boosted:
+            score += 40
+            
+        return score
+
+    # Sort orders by the calculated score (highest first)
+    sorted_orders = sorted(all_orders, key=get_score, reverse=True)
+    return sorted_orders
 
 @app.patch("/orders/{order_id}/status")
 async def update_order_status(order_id: int, status: str, db: Session = Depends(get_db)):
