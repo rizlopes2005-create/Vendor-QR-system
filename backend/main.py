@@ -31,6 +31,18 @@ app.add_middleware(
 # Auto-seed on startup if DB is empty or update broken images
 @app.on_event("startup")
 def startup_event():
+    # 1. Auto-migration check
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("SELECT is_loyalty_boosted FROM orders LIMIT 1"))
+        except Exception:
+            try:
+                conn.execute(text("ALTER TABLE orders ADD COLUMN is_loyalty_boosted BOOLEAN DEFAULT 0"))
+                print("Added is_loyalty_boosted column to orders table")
+            except Exception as e:
+                print(f"Migration failed: {e}")
+
     db = next(get_db())
     if db.query(models.MenuItem).count() == 0:
         print("Empty database detected. Auto-seeding...")
