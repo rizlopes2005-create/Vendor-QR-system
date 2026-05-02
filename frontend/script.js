@@ -1,17 +1,18 @@
 // Detect if running locally or on deployed site
-const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const hostname = window.location.hostname;
+const IS_LOCAL = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.');
 
 // 🔴 YOUR RENDER BACKEND URL
 const PROD_BACKEND_URL = 'https://vendor-qr-system-1.onrender.com';
 
 // API endpoint (REST)
 const API_URL = IS_LOCAL
-    ? 'http://localhost:8000'
+    ? `http://${hostname}:8000`
     : PROD_BACKEND_URL;
 
 // WebSocket endpoint (Real-time updates)
 const WS_URL = IS_LOCAL
-    ? 'ws://localhost:8000/ws'
+    ? `ws://${hostname}:8000/ws`
     : PROD_BACKEND_URL.replace('https', 'wss').replace('http', 'ws') + '/ws';
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -424,6 +425,23 @@ let vendorOrders = [];
 async function initVendorDashboard() {
     loadVendorOrders();
     generateVendorQR();
+    
+    // Refresh QR code every 30 seconds with a visual countdown
+    let timeLeft = 30;
+    const updateCountdown = () => {
+        const timerEl = document.querySelector('#qr-refresh-timer span:last-child');
+        if (timerEl) timerEl.innerText = `Refreshing in ${timeLeft}s`;
+        
+        const progressEl = document.getElementById('qr-progress-bar');
+        if (progressEl) progressEl.style.width = `${(timeLeft / 30) * 100}%`;
+        
+        if (timeLeft <= 0) {
+            generateVendorQR();
+            timeLeft = 30;
+        }
+        timeLeft--;
+    };
+    setInterval(updateCountdown, 1000);
 
     const ws = new WebSocket(WS_URL);
     ws.onmessage = (event) => {
@@ -599,14 +617,27 @@ function generateVendorQR() {
     if (!container) return;
 
     container.innerHTML = "";
+    
+    // Get current origin for local/prod testing support
+    const currentOrigin = window.location.origin;
+    // Add a unique timestamp to make the URL/QR dynamic
+    const timestamp = Math.floor(Date.now() / 1000);
+    const menuUrl = `${currentOrigin}/menu.html?v=${timestamp}`;
+    
+    console.log("Generating dynamic QR for:", menuUrl);
+
     new QRCode(container, {
-        text: "https://vendor-qr-system-26.vercel.app/menu",
+        text: menuUrl,
         width: 256,
         height: 256,
         colorDark: "#1E293B",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H
     });
+
+    // Optional: Update the visible URL text if it exists in a modal
+    const urlText = document.querySelector('.qr-modal .url-display');
+    if (urlText) urlText.innerText = menuUrl;
 }
 
 function downloadQRCode() {
@@ -633,6 +664,9 @@ function printQRCode() {
     const qrSrc = img ? img.src : (canvas ? canvas.toDataURL("image/png") : "");
 
     if (!qrSrc) return;
+
+    const currentOrigin = window.location.origin;
+    const menuUrl = `${currentOrigin}/menu.html`;
 
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
@@ -692,7 +726,7 @@ function printQRCode() {
                     <h1>Scan to View Menu</h1>
                     <p>Place your order directly from your phone!</p>
                     <img src="${qrSrc}" />
-                    <div class="url">https://vendor-qr-system-26.vercel.app/menu</div>
+                    <div class="url">${menuUrl}</div>
                 </div>
                 <script>
                     window.onload = function() {
