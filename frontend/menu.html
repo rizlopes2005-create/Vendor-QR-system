@@ -19,9 +19,15 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="app-header">
-                <div>
-                    <h1>Welcome to Arun Bites</h1>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">What would you like to eat today?</p>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                    <div>
+                        <h1>Welcome to Arun Bites</h1>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">What would you like to eat today?</p>
+                    </div>
+                    <div id="menu-wait-time" style="background: #FFF5F5; color: #FF4D00; padding: 6px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; border: 1px solid #FED7D7; display: flex; align-items: center; gap: 5px;">
+                        <span>🕒</span>
+                        <span>Wait: ~10 mins</span>
+                    </div>
                 </div>
                 <div class="header-actions">
                     <div class="search-bar">

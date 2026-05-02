@@ -46,6 +46,12 @@ async function loadMenu() {
         window.menuItems = items;
         renderMenu(items);
         renderCategories(items);
+
+        // Fetch wait time
+        const waitRes = await fetch(`${API_URL}/wait-time`);
+        const waitData = await waitRes.json();
+        const waitEl = document.getElementById('menu-wait-time');
+        if (waitEl) waitEl.querySelector('span:last-child').innerText = `Wait: ~${waitData.estimated_wait_minutes} mins`;
     } catch (err) {
         console.error(err);
         document.getElementById('menu-container').innerHTML = '<p style="text-align:center; padding:20px;">Could not load menu. Make sure the backend is running.</p>';
@@ -407,6 +413,12 @@ async function trackOrder(orderId) {
         const res = await fetch(`${API_URL}/orders/${orderId}`);
         const order = await res.json();
         updateUI(order);
+
+        // Fetch wait time
+        const waitRes = await fetch(`${API_URL}/wait-time`);
+        const waitData = await waitRes.json();
+        const waitEl = document.getElementById('wait-time');
+        if (waitEl) waitEl.innerText = `~${waitData.estimated_wait_minutes} mins`;
     } catch (e) { }
 
     // Listen for real-time status updates via WebSocket

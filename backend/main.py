@@ -66,7 +66,17 @@ def calculate_priority(order: models.Order, items_count: int):
     score = priority_queue.calculate_priority(items_count, is_prepaid)
     return score > 0
 
+def get_wait_time_estimate(db: Session):
+    pending_count = db.query(models.Order).filter(models.Order.status == "Pending").count()
+    preparing_count = db.query(models.Order).filter(models.Order.status == "Preparing").count()
+    # Simple heuristic: 3 mins per pending, 5 mins per preparing
+    total_mins = (pending_count * 3) + (preparing_count * 5)
+    return max(5, total_mins) # Minimum 5 mins
+
 # Endpoints
+@app.get("/wait-time")
+def get_wait_time(db: Session = Depends(get_db)):
+    return {"estimated_wait_minutes": get_wait_time_estimate(db)}
 @app.get("/menu", response_model=List[schemas.MenuItem])
 def get_menu(db: Session = Depends(get_db)):
     return db.query(models.MenuItem).all()
