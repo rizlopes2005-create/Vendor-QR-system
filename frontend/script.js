@@ -52,6 +52,8 @@ async function loadMenu() {
         const waitData = await waitRes.json();
         const waitEl = document.getElementById('menu-wait-time');
         if (waitEl) waitEl.querySelector('span:last-child').innerText = `Wait: ~${waitData.estimated_wait_minutes} mins`;
+        
+        updateLoyaltyUI();
     } catch (err) {
         console.error(err);
         document.getElementById('menu-container').innerHTML = '<p style="text-align:center; padding:20px;">Could not load menu. Make sure the backend is running.</p>';
@@ -367,13 +369,21 @@ async function placeOrder() {
         });
 
         if (!response.ok) throw new Error('Failed to place order');
-        const order = await response.json();
+        
+        if (response.ok) {
+            const order = await response.json();
+            
+            // Loyalty Logic: Increment stamp count
+            let stamps = parseInt(localStorage.getItem('loyalty_stamps') || '0');
+            stamps = (stamps + 1) % 6; // Reset after 5 stamps
+            localStorage.setItem('loyalty_stamps', stamps);
+            
+            // Clear cart
+            cart = [];
+            updateLocalStorage();
 
-        // Clear cart
-        cart = [];
-        updateLocalStorage();
-
-        window.location.href = `confirmation.html?id=${order.id}`;
+            window.location.href = `confirmation.html?id=${order.id}`;
+        }
     } catch (err) {
         console.error(err);
         alert('Could not place order. Please try again.');
@@ -691,6 +701,35 @@ function renderTopItems(data) {
             <div style="font-size: 0.75rem; opacity: 0.8;">${item.count} orders</div>
         </div>
     `).join('');
+}
+
+function updateLoyaltyUI() {
+    const section = document.getElementById('loyalty-section');
+    const container = document.getElementById('stamps-container');
+    const label = document.getElementById('stamps-needed');
+    if (!section || !container) return;
+
+    const stamps = parseInt(localStorage.getItem('loyalty_stamps') || '0');
+    section.style.display = 'block';
+
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        const isEarned = i <= stamps;
+        html += `
+            <div style="width: 35px; height: 35px; background: ${isEarned ? 'var(--primary)' : 'white'}; border: 2px solid ${isEarned ? 'var(--primary)' : '#E2E8F0'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: ${isEarned ? 'white' : '#CBD5E1'};">
+                ${isEarned ? '🥘' : '◯'}
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+    
+    if (stamps >= 5) {
+        label.innerText = "FREE ITEM UNLOCKED! 🎉";
+        label.style.color = "var(--success)";
+    } else {
+        label.innerText = `${5 - stamps} orders to go!`;
+        label.style.color = "var(--primary)";
+    }
 }
 
 function openQRModal() {
