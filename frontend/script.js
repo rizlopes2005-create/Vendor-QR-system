@@ -519,22 +519,23 @@ function renderVendorOrders() {
         return;
     }
 
-    container.innerHTML = '';
-
-    // Stats
-    document.getElementById('stats-orders').innerText = vendorOrders.length;
+    // Update Stats
     const todaySales = vendorOrders.reduce((sum, o) => o.status !== 'Cancelled' ? sum + o.total_amount : sum, 0);
+    document.getElementById('stats-orders').innerText = vendorOrders.length;
     document.getElementById('stats-sales').innerText = `₹${todaySales}`;
 
-    // Filter active orders (remove Ready, Delivered and Cancelled from main vendor view)
+    // Filter active orders
     const activeOrders = vendorOrders.filter(o => o.status !== 'Ready' && o.status !== 'Delivered' && o.status !== 'Cancelled');
     document.getElementById('order-count-badge').innerText = activeOrders.length;
+
+    // Update Batch Summary Bar
+    updateBatchSummary(activeOrders);
 
     if (activeOrders.length === 0) {
         container.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px;">
                 <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 20px;">🍱</div>
-                <h3 style="color: var(--text-main); font-weight: 800;">No Active Orders</h3>
+                <h3 style="color: white; font-weight: 800;">Kitchen is Clear</h3>
                 <p style="color: var(--text-muted);">New orders will appear here automatically.</p>
             </div>
         `;
@@ -544,66 +545,81 @@ function renderVendorOrders() {
     container.innerHTML = '';
 
     activeOrders.forEach(order => {
+        const orderAgeMins = (new Date() - new Date(order.timestamp)) / 60000;
+        const isHeatAlert = orderAgeMins > 10; // Old order alert after 10 mins
+
         const card = document.createElement('div');
-        card.className = `order-card animate-fade-in ${order.is_priority ? 'priority' : ''}`;
+        card.className = `order-card animate-fade-in ${isHeatAlert ? 'heat-alert' : ''}`;
         card.id = `order-${order.id}`;
-        card.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
 
         const itemsHtml = order.items.map(i => `
-            <div class="order-item-row">
-                <span>${i.quantity}x ${i.menu_item.name}</span>
-                <span style="color:var(--text-muted);">₹${i.menu_item.price * i.quantity}</span>
+            <div class="order-item-row" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 0;">
+                <span style="font-weight:700;">${i.quantity}x ${i.menu_item.name}</span>
+                <span style="color:#94A3B8;">₹${i.menu_item.price * i.quantity}</span>
             </div>
         `).join('');
 
         const time = new Date(order.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+        let actionButton = '';
+        if (order.status === 'Pending') {
+            actionButton = `<button class="action-btn-main btn-start" onclick="updateStatus(${order.id}, 'Preparing')">🔥 Start Cooking</button>`;
+        } else if (order.status === 'Preparing') {
+            actionButton = `<button class="action-btn-main btn-ready" onclick="updateStatus(${order.id}, 'Ready')">✅ Ready for Pickup</button>`;
+        }
+
         card.innerHTML = `
-            <div class="order-header">
+            <div class="order-header" style="margin-bottom: 15px;">
                 <div>
-                    <span class="order-id">Token #${order.token_number}</span>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Placed at ${time}</p>
+                    <span class="order-id" style="font-size: 1.4rem;">Token #${order.token_number}</span>
+                    <p style="font-size: 0.8rem; color: #94A3B8; margin-top: 4px;">Placed ${Math.floor(orderAgeMins)}m ago (${time})</p>
                 </div>
-                <span class="badge badge-${order.status.toLowerCase()}">${order.status}</span>
+                <span class="badge badge-${order.status.toLowerCase()}" style="font-size: 0.7rem;">${order.status}</span>
             </div>
             
-            <div class="order-items-list">
+            <div class="order-items-list" style="margin-bottom: 15px;">
                 ${itemsHtml}
             </div>
 
             <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
-                ${order.payment_method === 'UPI' ? '<span style="background:#EBF8FF; color:#2B6CB0; padding:4px 8px; border-radius:6px; font-size:0.65rem; font-weight:800; border:1px solid #BEE3F8;">💳 UPI</span>' : ''}
-                ${order.items.reduce((s, i) => s + i.quantity, 0) <= 2 ? '<span style="background:#F0FFF4; color:#2F855A; padding:4px 8px; border-radius:6px; font-size:0.65rem; font-weight:800; border:1px solid #C6F6D5;">⚡ FAST TRACK</span>' : ''}
-                ${order.is_loyalty_boosted ? '<span style="background:#FAF5FF; color:#6B46C1; padding:4px 8px; border-radius:6px; font-size:0.65rem; font-weight:800; border:1px solid #E9D8FD;">👑 LOYALTY</span>' : ''}
-                <span style="background:#F7FAFC; color:#4A5568; padding:4px 8px; border-radius:6px; font-size:0.65rem; font-weight:800; border:1px solid #EDF2F7;">💰 ₹${order.total_amount}</span>
+                ${order.payment_method === 'UPI' ? '<span style="background:rgba(59, 130, 246, 0.1); color:#60A5FA; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; border:1px solid rgba(59, 130, 246, 0.2);">💳 UPI PAID</span>' : ''}
+                ${order.items.reduce((s, i) => s + i.quantity, 0) <= 2 ? '<span style="background:rgba(16, 185, 129, 0.1); color:#34D399; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; border:1px solid rgba(16, 185, 129, 0.2);">⚡ FAST TRACK</span>' : ''}
+                ${order.is_loyalty_boosted ? '<span style="background:rgba(139, 92, 246, 0.1); color:#A78BFA; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; border:1px solid rgba(139, 92, 246, 0.2);">👑 LOYALTY</span>' : ''}
             </div>
 
-            <div style="display: flex; gap: 10px;">
-            ${order.is_priority ? `
-                <div style="background: #FFF5F5; padding: 10px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: #D63031; border: 1px solid #FED7D7;">
-                    <span style="font-size: 1.2rem;">★</span>
-                    <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Priority: Small Order</span>
-                </div>
-            ` : ''}
-
-            <div style="display: flex; gap: 10px;">
-                ${order.status === 'Pending' ? `
-                    <button type="button" class="btn btn-primary" style="flex:1;" onclick="updateStatus(${order.id}, 'Preparing')">Accept & Cook</button>
-                ` : ''}
-                
-                ${order.status === 'Preparing' ? `
-                    <button type="button" class="btn btn-warning" style="flex:1; background:#F1C40F; color:#1E293B;" onclick="updateStatus(${order.id}, 'Ready')">Mark Ready</button>
-                ` : ''}
-                
-                ${order.status === 'Ready' ? `
-                    <button type="button" class="btn btn-success" style="flex:1; background:#10B981; color:white;" onclick="updateStatus(${order.id}, 'Delivered')">Done (Hand Over)</button>
-                ` : ''}
-
-                <button type="button" class="btn btn-outline" style="width: 50px; padding: 0;" title="Cancel Order" onclick="updateStatus(${order.id}, 'Cancelled')">×</button>
-            </div>
+            ${actionButton}
+            
+            <button class="btn-outline" style="width: 100%; margin-top: 10px; border-color: #334155; color: #94A3B8; font-size: 0.75rem; border-radius: 8px; padding: 5px;" onclick="updateStatus(${order.id}, 'Cancelled')">Cancel Order</button>
         `;
         container.appendChild(card);
     });
+}
+
+function updateBatchSummary(orders) {
+    const bar = document.getElementById('batch-prep-bar');
+    if (!bar) return;
+
+    if (orders.length === 0) {
+        bar.style.display = 'none';
+        return;
+    }
+
+    const itemCounts = {};
+    orders.forEach(o => {
+        o.items.forEach(i => {
+            const name = i.menu_item.name;
+            itemCounts[name] = (itemCounts[name] || 0) + i.quantity;
+        });
+    });
+
+    const pills = Object.entries(itemCounts).map(([name, count]) => `
+        <div class="batch-pill">
+            <span style="opacity: 0.7;">${count}x</span> ${name}
+        </div>
+    `).join('');
+
+    bar.innerHTML = `<span style="font-size: 0.8rem; font-weight: 800; color: #94A3B8; margin-right: 10px;">PREP TOTALS:</span> ${pills}`;
+    bar.style.display = 'flex';
 }
 
 async function updateStatus(orderId, status) {

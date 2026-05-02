@@ -9,20 +9,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 
-<body>
-    <header class="dashboard-header mb-4">
+<body class="vendor-body">
+    <header class="dashboard-header mb-4" style="background: rgba(255,255,255,0.02); border-bottom: 1px solid #334155;">
         <div class="container flex justify-between items-center p-2">
             <div>
-                <h1 class="font-extrabold" style="font-size: 1.8rem;">Vendor Dashboard</h1>
-                <p class="text-muted" style="font-size: 0.9rem; opacity: 1;">Manage your live orders and track sales</p>
+                <h1 class="font-extrabold" style="font-size: 1.8rem; color: var(--primary);">Arun Bites Kitchen</h1>
+                <p class="text-muted" style="font-size: 0.9rem; opacity: 1;">Command Center v2.0</p>
             </div>
             <div id="connection-status" class="badge"
-                style="background: #00B894; color: white; padding: 8px 16px; border-radius: 50px;">
+                style="background: #10B981; color: white; padding: 8px 16px; border-radius: 50px; font-weight: 800;">
                 ● Live</div>
         </div>
     </header>
 
     <main class="container">
+        <!-- Batch Prep Summary Bar -->
+        <div id="batch-prep-bar" class="batch-bar animate-fade-in" style="display: none;">
+            <!-- Summarized counts will appear here -->
+        </div>
         <div class="stats-grid mb-1">
             <div class="stat-card">
                 <span class="stat-value" id="stats-orders">0</span>
